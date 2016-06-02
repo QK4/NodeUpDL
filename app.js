@@ -48,7 +48,6 @@ function downloadEp(url, i, max = i){
             if (title.indexOf('.') == title.length-1){
                 title = title.slice(0,title.length-1)
             }
-            fs.mkdirSync('./nodeup')
             dest = ('./nodeup/NodeUp ' + i + ' -' + title + '.mp3')
            	console.log('Downloading ' + url + ' \nTo ' + dest + ' ...');
             // Write file
