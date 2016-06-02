@@ -12,6 +12,10 @@
   "author": "qk4",
   "license": "ISC",
   "homepage": "https://github.com/QK4/NodeUpDL",
+  "repository": {
+      "type": "git",
+          "url": "git://github.com/tunnckoCore/homepage.git"
+      },
   "dependencies": {
     "xml2json": "^0.9.0"
   },
