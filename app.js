@@ -41,7 +41,6 @@ function downloadEp(url, i, max = i){
             if (eps[eps.length-i].title.indexOf('-') > -1){
                 titleSplit = eps[(eps.length-i)].title.split('-')
             } else {
-                console.log('title does not contain -')
                 titleSplit = eps[(eps.length-i)].title.split(':')
             }
             title = titleSplit[1]
