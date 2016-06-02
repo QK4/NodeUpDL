@@ -13,5 +13,8 @@
   "license": "ISC",
   "dependencies": {
     "xml2json": "^0.9.0"
+  },
+  "bin": {
+    "nodeupdl": "app.js"
   }
 }
