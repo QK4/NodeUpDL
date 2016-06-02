@@ -1,3 +1,5 @@
+#! /usr/bin/env node
+
 var http = require('http')
 var fs = require('fs')
 var parser = require('xml2json')
