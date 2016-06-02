@@ -67,50 +67,52 @@ function downloadEp(url, i, max = i){
     })
 }
 
+var help = 'Usage: nodeupdl [\'latest\'] or [\'all\'] or [episode number] or [episode range] or [\'list\']' +
+    '\neg. nodeupdl latest' + 
+    '\n    nodeupdl all' +
+    '\n    nodeupdl 25' +
+    '\n    nodeupdl 75-100' +
+    '\n    nodeupdl list'
+
 // Check user input and do what they want
-
-// If user input 'latest'
-if (process.argv[2] == 'latest') {
-    getEps(function(eps){
-        downloadEp(eps[0].guid.$t, eps.length)
-    })
-// If user input a range
-} else if (process.argv[2].indexOf('-') > -1){
-    getEps(function(eps){
-        numbers = process.argv[2].split('-')
-        downloadEp(eps[eps.length-numbers[0]].guid.$t, numbers[0], numbers[1])
-    })
-// If user input an episode number
-} else if (Number.isInteger(parseInt(process.argv[2], 10))){
-    i = parseInt(process.argv[2], 10)
-    getEps(function(eps){
-        if (i > 0 && i <= eps.length){
-            downloadEp(eps[(eps.length-(i))].guid.$t, eps.length-(eps.length-i))
-        } else {
-            console.log('That episode doesn\'t seem to exist')
-        }
-    })
-// If user input 'all'
-} else if (process.argv[2] == 'all'){
-    getEps(function(eps){
-        downloadEp(eps[eps.length-1].guid.$t, 1, eps.length)
-    })
-// If user input 'list'
-} else if (process.argv[2] == 'list'){
-    getEps(function(eps){
-        for (i=eps.length-1;i>-1;i--){
-            console.log(eps[i].title)
-        }
-    })
-// If user input something else
+if (process.argv[2]){
+    // If user input 'latest'
+    if (process.argv[2] == 'latest') {
+        getEps(function(eps){
+            downloadEp(eps[0].guid.$t, eps.length)
+        })
+    // If user input a range
+    } else if (process.argv[2].indexOf('-') > -1){
+        getEps(function(eps){
+            numbers = process.argv[2].split('-')
+            downloadEp(eps[eps.length-numbers[0]].guid.$t, numbers[0], numbers[1])
+        })
+    // If user input an episode number
+    } else if (Number.isInteger(parseInt(process.argv[2], 10))){
+        i = parseInt(process.argv[2], 10)
+        getEps(function(eps){
+            if (i > 0 && i <= eps.length){
+                downloadEp(eps[(eps.length-(i))].guid.$t, eps.length-(eps.length-i))
+            } else {
+                console.log('That episode doesn\'t seem to exist')
+            }
+        })
+    // If user input 'all'
+    } else if (process.argv[2] == 'all'){
+        getEps(function(eps){
+            downloadEp(eps[eps.length-1].guid.$t, 1, eps.length)
+        })
+    // If user input 'list'
+    } else if (process.argv[2] == 'list'){
+        getEps(function(eps){
+            for (i=eps.length-1;i>-1;i--){
+                console.log(eps[i].title)
+            }
+        })
+    // If user input something else
+    } else {
+        console.log(help)
+    }
 } else {
-    console.log(
-        'Usage: nodeupdl [\'latest\'] or [\'all\'] or [episode number] or [episode range] or [\'list\']' +
-        '\neg. nodeupdl latest' + 
-        '\n    nodeupdl all' +
-        '\n    nodeupdl 25' +
-        '\n    nodeupdl 75-100' +
-        '\n    nodeupdl list'
-    )
+    console.log(help)
 }
-
