@@ -1,6 +1,6 @@
 {
   "name": "nodeupdl",
-  "version": "1.1.7",
+  "version": "1.1.8",
   "description": "Download NodeUp with Node!",
   "main": "app.js",
   "scripts": {
@@ -13,9 +13,9 @@
   "license": "ISC",
   "homepage": "https://github.com/QK4/NodeUpDL",
   "repository": {
-      "type": "git",
-          "url": "git://github.com/tunnckoCore/homepage.git"
-      },
+    "type": "git",
+    "url": "git://github.com/tunnckoCore/homepage.git"
+  },
   "dependencies": {
     "xml2json": "^0.9.0"
   },
