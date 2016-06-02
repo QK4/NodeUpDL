@@ -11,6 +11,7 @@
   ],
   "author": "qk4",
   "license": "ISC",
+  "homepage": "https://github.com/QK4/NodeUpDL",
   "dependencies": {
     "xml2json": "^0.9.0"
   },
