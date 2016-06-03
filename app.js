@@ -1,71 +1,12 @@
 #! /usr/bin/env node
 
+// Load modules
 var http = require('http')
 var fs = require('fs')
 var parser = require('xml2json')
 
-// Get list of episodes
-function getEps(cb){
-    var epsUrl = 'http://feeds.feedburner.com/nodeup'
-    console.log('\nGetting episode list...')
-    var requestEps = http.get(epsUrl, function(response){
-        if (response.statusCode == 200){
-            response.setEncoding('utf8')
-            var file = fs.createWriteStream('temp.xml')
-            response.pipe(file)
-            file.on('finish', function(){
-                file.close()
-                var xml = fs.readFileSync('temp.xml')
-                fs.unlink('temp.xml')
-                var json = parser.toJson(xml, {object: true})
-                eps = json['rss'].channel.item
-                cb(eps)
-            });
-        } else {
-            console.log('Failed to get episode list, response status code was: ' + response.statusCode)
-        }
-    })
-}
-
-// Download an episode, then check if another needs downloading
-function downloadEp(url, i, max = i){
-    var requestEp = http.get(url, function(response){
-        if (response.statusCode == 302 || response.statusCode == 301){
-			var newUrl = response.headers['location'];
-			//console.log('Redirected to: ' + newUrl);	
-			downloadEp(newUrl, i, max);
-			return
-		} else {
-            // Create file name
-            // Get episode title
-            if (eps[eps.length-i].title.indexOf('-') > -1){
-                titleSplit = eps[(eps.length-i)].title.split('-')
-            } else {
-                titleSplit = eps[(eps.length-i)].title.split(':')
-            }
-            title = titleSplit[1]
-            // Remove '.' from title end
-            if (title.indexOf('.') == title.length-1){
-                title = title.slice(0,title.length-1)
-            }
-            dest = ('./NodeUp ' + i + ' -' + title + '.mp3')
-           	console.log('Downloading ' + url + ' \nTo ' + dest + ' ...');
-            // Write file
-			var file = fs.createWriteStream(dest);
-			response.pipe(file);
-			file.on('finish', function(){
-				file.close(console.log('Download Finished'));
-                // Download next episode if required
-                if (i < max){
-                    i++
-                    downloadEp(eps[(eps.length-i)].guid.$t, i, max)
-                }
-			}); 
-        }     
-    })
-}
-
-var help = 'Usage: nodeupdl [\'latest\'] or [\'all\'] or [episode number] or [episode range] or [\'list\']' +
+// How to use info
+help = 'Usage: nodeupdl [\'latest\'] or [\'all\'] or [episode number] or [episode range] or [\'list\']' +
     '\neg. nodeupdl latest' + 
     '\n    nodeupdl all' +
     '\n    nodeupdl 25' +
@@ -112,5 +53,71 @@ if (process.argv[2]){
         console.log(help)
     }
 } else {
+    // If user didn't input any arguments
     console.log(help)
 }
+
+// Get list of episodes
+function getEps(cb){
+    epsUrl = 'http://feeds.feedburner.com/nodeup'
+    console.log('\nGetting episode list...')
+    http.get(epsUrl, function(response){
+        if (response.statusCode == 200){
+            response.setEncoding('utf8')
+            // Change XML response to JSON then return the episodes array
+            file = fs.createWriteStream('temp.xml')
+            response.pipe(file)
+            file.on('finish', function(){
+                file.close()
+                xml = fs.readFileSync('temp.xml')
+                fs.unlink('temp.xml')
+                json = parser.toJson(xml, {object: true})
+                eps = json['rss'].channel.item
+                cb(eps)
+            });
+        } else {
+            // Tell user if it didn't work
+            console.log('Failed to get episode list')
+        }
+    })
+}
+
+// Download an episode, then check if another needs downloading
+function downloadEp(url, i, max = i){
+    http.get(url, function(response){
+        if (response.statusCode == 302 || response.statusCode == 301){
+			newUrl = response.headers['location'];
+			//console.log('Redirected to: ' + newUrl);	
+			downloadEp(newUrl, i, max);
+			return
+		} else {
+            // Create file name
+            // Get episode title
+            if (eps[eps.length-i].title.indexOf('-') > -1){
+                titleSplit = eps[(eps.length-i)].title.split('-')
+            } else {
+                titleSplit = eps[(eps.length-i)].title.split(':')
+            }
+            title = titleSplit[1]
+            // Remove '.' from title end
+            if (title.indexOf('.') == title.length-1){
+                title = title.slice(0,title.length-1)
+            }
+            fileName = ('./NodeUp ' + i + ' -' + title + '.mp3')
+           	console.log('Downloading ' + url + ' \nTo ' + fileName + ' ...');
+            // Write file
+			file = fs.createWriteStream(fileName);
+			response.pipe(file);
+			file.on('finish', function(){
+				file.close(console.log('Download Finished'));
+                // Download next episode if required
+                if (i < max){
+                    i++
+                    downloadEp(eps[(eps.length-i)].guid.$t, i, max)
+                }
+			}); 
+        }     
+    })
+}
+
+
