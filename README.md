@@ -9,21 +9,21 @@ $ npm install -g nodeupdl
 ### Use
 To download the latest episode
 ```bash
-nodeupdl latest
+$ nodeupdl latest
 ```
 To list all episode titles
 ```bash
-nodeupdl list
+$ nodeupdl list
 ```
 To download all episodes
 ```bash
-nodeupdl all
+$ nodeupdl all
 ```
 To download a specific episode
 ```bash
-nodeupdl 66
+$ nodeupdl 66
 ```
 To download a range of episodes
 ```bash
-nodeupdl 75-100
+$ nodeupdl 75-100
 ```
