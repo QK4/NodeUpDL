@@ -1,4 +1,4 @@
-# NodeUpDL
+# NodeUpDL [![NPM Version](https://img.shields.io/npm/v/nodeupdl.svg?style=flat)](https://www.npmjs.org/package/nodeupdl)
 Download NodeUp with Node!
 
 ### Install
