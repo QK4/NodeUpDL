@@ -103,6 +103,11 @@ function downloadEp(url, i, max = i){
             if (title.indexOf('.') == title.length-1){
                 title = title.slice(0,title.length-1)
             }
+            // remove '/' and ':' from title
+            var slash = new RegExp('/', 'g')
+	    var colon = new RegExp(':', 'g')
+            title = title.replace(slash, '').replace(colon, '')
+	    
             fileName = ('./NodeUp ' + i + ' -' + title + '.mp3')
            	console.log('Downloading ' + url + ' \nTo ' + fileName + ' ...');
             // Write file
