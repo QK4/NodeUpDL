@@ -7,7 +7,7 @@ const parser = require('xml2json')
 
 // How to use info
 const help = 'Usage: nodeupdl [\'latest\'] or [\'all\'] or [episode number] or [episode range] or [\'list\']' +
-    '\neg. nodeupdl latest' + 
+    '\neg. nodeupdl latest' +
     '\n    nodeupdl all' +
     '\n    nodeupdl 25' +
     '\n    nodeupdl 75-100' +
@@ -82,17 +82,17 @@ function getEps(cb){
     })
 }
 
-// Download an episode, then check if another needs downloading 
-// Parameters - url to download, episode number/low range number, high range number(optional) 
+// Download an episode, then check if another needs downloading
+// Parameters - url to download, episode number/low range number, high range number(optional)
 function downloadEp(url, i, max = i){
     http.get(url, function(response){
         // Handle redirect
         if (response.statusCode == 302 || response.statusCode == 301){
-			      let newUrl = response.headers['location'];
-			      //console.log('Redirected to: ' + newUrl);	
-			      downloadEp(newUrl, i, max);
-			      return
-		    } else {
+            let newUrl = response.headers['location'];
+            //console.log('Redirected to: ' + newUrl)
+            downloadEp(newUrl, i, max);
+            return
+        } else {
             // Get episode title
             if (eps[eps.length-i].title.indexOf('-') > -1){
                 var titleSplit = eps[(eps.length-i)].title.split('-')
@@ -109,26 +109,24 @@ function downloadEp(url, i, max = i){
 
             // Remove '/' and ':' from title
             const slash = new RegExp('/', 'g')
-	          const colon = new RegExp(':', 'g')
+            const colon = new RegExp(':', 'g')
             title = title.replace(slash, '-').replace(colon, '-')
 
             // Set file name
             let fileName = ('./NodeUp ' + i + ' -' + title + '.mp3')
-           	console.log('Downloading ' + url + ' \nTo ' + fileName + ' ...')
+            console.log('Downloading ' + url + ' \nTo ' + fileName + ' ...')
 
             // Write file
-			      let file = fs.createWriteStream(fileName)
-			      response.pipe(file)
-			      file.on('finish', function(){
-				      file.close(console.log('Download Finished'))
+            let file = fs.createWriteStream(fileName)
+            response.pipe(file)
+            file.on('finish', function(){
+              file.close(console.log('Download Finished'))
               // Download next episode if required
               if (i < max){
                   i++
                   downloadEp(eps[(eps.length-i)].guid.$t, i, max)
               }
-			      }); 
-        }     
+            });
+        }
     })
 }
-
-
