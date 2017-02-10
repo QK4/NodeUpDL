@@ -1,12 +1,12 @@
 #! /usr/bin/env node
 
 // Load modules
-var http = require('http')
-var fs = require('fs')
-var parser = require('xml2json')
+const http = require('http')
+const fs = require('fs')
+const parser = require('xml2json')
 
 // How to use info
-help = 'Usage: nodeupdl [\'latest\'] or [\'all\'] or [episode number] or [episode range] or [\'list\']' +
+const help = 'Usage: nodeupdl [\'latest\'] or [\'all\'] or [episode number] or [episode range] or [\'list\']' +
     '\neg. nodeupdl latest' + 
     '\n    nodeupdl all' +
     '\n    nodeupdl 25' +
@@ -23,12 +23,12 @@ if (process.argv[2]){
     // If user input a range
     } else if (process.argv[2].indexOf('-') > -1){
         getEps(function(eps){
-            numbers = process.argv[2].split('-')
+            let numbers = process.argv[2].split('-')
             downloadEp(eps[eps.length-numbers[0]].guid.$t, numbers[0], numbers[1])
         })
     // If user input an episode number
     } else if (Number.isInteger(parseInt(process.argv[2], 10))){
-        i = parseInt(process.argv[2], 10)
+        let i = parseInt(process.argv[2], 10)
         getEps(function(eps){
             if (i > 0 && i <= eps.length){
                 downloadEp(eps[(eps.length-(i))].guid.$t, eps.length-(eps.length-i))
@@ -59,20 +59,20 @@ if (process.argv[2]){
 
 // Get list of episodes
 function getEps(cb){
-    epsUrl = 'http://feeds.feedburner.com/nodeup'
+    let epsUrl = 'http://feeds.feedburner.com/nodeup'
     console.log('\nGetting episode list...')
     http.get(epsUrl, function(response){
         if (response.statusCode == 200){
             response.setEncoding('utf8')
-            // Change XML response to JSON then return the episodes array
-            file = fs.createWriteStream('temp.xml')
+            // Change XML response to JSON then return the episodes array - does this really need to write a file?
+            let file = fs.createWriteStream('temp.xml')
             response.pipe(file)
             file.on('finish', function(){
                 file.close()
-                xml = fs.readFileSync('temp.xml')
-                fs.unlink('temp.xml')
-                json = parser.toJson(xml, {object: true})
-                eps = json['rss'].channel.item
+                let xml = fs.readFileSync('temp.xml')
+                fs.unlinkSync('temp.xml')
+                let json = parser.toJson(xml, {object: true})
+                eps = json['rss'].channel.item // Declaring this with let breaks downloadEp()s reference to eps. But passing eps in seems silly. Needs work.
                 cb(eps)
             });
         } else {
@@ -82,45 +82,51 @@ function getEps(cb){
     })
 }
 
-// Download an episode, then check if another needs downloading
+// Download an episode, then check if another needs downloading 
+// Parameters - url to download, episode number/low range number, high range number(optional) 
 function downloadEp(url, i, max = i){
     http.get(url, function(response){
+        // Handle redirect
         if (response.statusCode == 302 || response.statusCode == 301){
-			newUrl = response.headers['location'];
-			//console.log('Redirected to: ' + newUrl);	
-			downloadEp(newUrl, i, max);
-			return
-		} else {
-            // Create file name
+			      let newUrl = response.headers['location'];
+			      //console.log('Redirected to: ' + newUrl);	
+			      downloadEp(newUrl, i, max);
+			      return
+		    } else {
             // Get episode title
             if (eps[eps.length-i].title.indexOf('-') > -1){
-                titleSplit = eps[(eps.length-i)].title.split('-')
+                var titleSplit = eps[(eps.length-i)].title.split('-')
             } else {
-                titleSplit = eps[(eps.length-i)].title.split(':')
+                var titleSplit = eps[(eps.length-i)].title.split(':')
             }
-            title = titleSplit[1]
+
+            let title = titleSplit[1]
+
             // Remove '.' from title end
             if (title.indexOf('.') == title.length-1){
                 title = title.slice(0,title.length-1)
             }
-            // remove '/' and ':' from title
-            var slash = new RegExp('/', 'g')
-	    var colon = new RegExp(':', 'g')
+
+            // Remove '/' and ':' from title
+            const slash = new RegExp('/', 'g')
+	          const colon = new RegExp(':', 'g')
             title = title.replace(slash, '-').replace(colon, '-')
-	    
-            fileName = ('./NodeUp ' + i + ' -' + title + '.mp3')
-           	console.log('Downloading ' + url + ' \nTo ' + fileName + ' ...');
+
+            // Set file name
+            let fileName = ('./NodeUp ' + i + ' -' + title + '.mp3')
+           	console.log('Downloading ' + url + ' \nTo ' + fileName + ' ...')
+
             // Write file
-			file = fs.createWriteStream(fileName);
-			response.pipe(file);
-			file.on('finish', function(){
-				file.close(console.log('Download Finished'));
-                // Download next episode if required
-                if (i < max){
-                    i++
-                    downloadEp(eps[(eps.length-i)].guid.$t, i, max)
-                }
-			}); 
+			      let file = fs.createWriteStream(fileName)
+			      response.pipe(file)
+			      file.on('finish', function(){
+				      file.close(console.log('Download Finished'))
+              // Download next episode if required
+              if (i < max){
+                  i++
+                  downloadEp(eps[(eps.length-i)].guid.$t, i, max)
+              }
+			      }); 
         }     
     })
 }
