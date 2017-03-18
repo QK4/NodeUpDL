@@ -107,7 +107,7 @@ function downloadEp(url, i, max = i){
                 title = title.slice(0,title.length-1)
             }
 
-            // Remove '/' and ':' from title
+            // Replace '/' and ':'  with '-' in title
             const slash = new RegExp('/', 'g')
             const colon = new RegExp(':', 'g')
             title = title.replace(slash, '-').replace(colon, '-')
